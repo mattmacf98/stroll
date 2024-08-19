@@ -1,24 +1,26 @@
-import { Text, StyleSheet, View, Image } from "react-native";
+import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
 
-export default function StartupPage() {
+export default function StartupPage({navigation}: any) {
     return (
         <View style={styles.container}>
-            <View style={styles.topHalf}>
+            <TouchableOpacity style={styles.topHalf}>
                 <Image
                     source={require('../assets/images/stroller.png')}
                     style={styles.image}
                     resizeMode="contain"
                 />
                 <Text style={styles.text}>Stroll</Text>
-            </View>
-            <View style={styles.bottomHalf}>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.bottomHalf} onPress={() => navigation.navigate("Goodbye")}>
                 <Image
                     source={require('../assets/images/scroller.png')}
                     style={styles.image}
                     resizeMode="contain"
                 />
                 <Text style={styles.text}>Scroll</Text>
-            </View>
+            </TouchableOpacity>
+           
         </View>
     )
 }

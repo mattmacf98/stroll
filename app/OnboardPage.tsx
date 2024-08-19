@@ -3,7 +3,7 @@ import { Dimensions, Image, Text, View, StyleSheet, TouchableOpacity, TextInput 
 
 const { height } = Dimensions.get('window');
 
-export default function OnboardPage({navigation}) {
+export default function OnboardPage({navigation}: any) {
   const [profilePicIndex, setProfilePicIndex] = useState(0);
   const [nameText, setNameText] = useState('');
   const profileImages = [

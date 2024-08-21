@@ -3,6 +3,7 @@ import { ImageSourcePropType } from "react-native";
 
 interface IStroll {
   owner: string,
+  title: string,
   strollers: string[],
   location: {
     burough: string,
@@ -55,13 +56,65 @@ export const StrollContext = createContext<StrollState>(
     setBuroughIndex: () => null, 
     setDuration: () => null, 
     strolls:[]
-  })
-  ;
+  });
 
 export const StrollProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [buroughIndex, setBuroughIndex] = useState<number>(-1);
-    const [duration, setDuration] = useState<number>(-1);
-    const [strolls, setStrolls] = useState<IStroll[]>([]);
+    const [buroughIndex, setBuroughIndex] = useState<number>(0);
+    const [duration, setDuration] = useState<number>(30);
+    const [strolls, setStrolls] = useState<IStroll[]>([
+      {
+        owner: "",
+        title: "Bob's Walk",
+        strollers: ['d'],
+        location: {
+          burough: "",
+          lat: 0,
+          lng: 0
+        },
+        startTime: "2024-07-30T09:00:00Z",
+        minutes: 60,
+        maxSize: 2
+      },
+      {
+        owner: "",
+        title: "Matthew's Walk",
+        strollers: ['d', 's'],
+        location: {
+          burough: "",
+          lat: 0,
+          lng: 0
+        },
+        startTime: "2024-07-30T12:00:00Z",
+        minutes: 30,
+        maxSize: 3
+      },
+      {
+        owner: "",
+        title: "Cindy's Walk",
+        strollers: ['s'],
+        location: {
+          burough: "",
+          lat: 0,
+          lng: 0
+        },
+        startTime: "2024-07-30T15:30:00Z",
+        minutes: 30,
+        maxSize: 2
+      },
+      {
+        owner: "",
+        title: "Jack's Walk",
+        strollers: ['s', 's','d'],
+        location: {
+          burough: "",
+          lat: 0,
+          lng: 0
+        },
+        startTime: "2024-07-30T17:30:00Z",
+        minutes: 15,
+        maxSize: 4
+      },
+  ]);
 
     useEffect(() => {
       // FETCH MATCHING STROLLS 

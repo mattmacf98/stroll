@@ -17,12 +17,13 @@ export const remove = mutation({
 
 export const create = mutation({
     args: { 
-        owner: v.id("users"), maxSize: v.int64(), burough: v.string(), lat: v.float64(), lng: v.float64(),
+        owner: v.id("users"), title: v.string(), maxSize: v.int64(), burough: v.string(), lat: v.float64(), lng: v.float64(),
         startTime: v.string(), minutes: v.int64()
      },
-    handler: async (ctx, { owner, maxSize, burough, lng, lat, startTime, minutes }) => {
+    handler: async (ctx, { owner, title, maxSize, burough, lng, lat, startTime, minutes }) => {
       const newStrollId = await ctx.db.insert("strolls", { 
         owner: owner, maxSize: maxSize, strollers: [], 
+        title: title,
         location: {
             burough: burough,
             lat: lat,

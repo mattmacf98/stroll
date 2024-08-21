@@ -11,6 +11,7 @@ export default defineSchema({
     }),
     strolls: defineTable({
         owner: v.id("users"),
+        title: v.string(),
         strollers: v.array(v.id("users")),
         location: v.object({
             burough: v.string(),

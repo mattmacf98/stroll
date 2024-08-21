@@ -3,7 +3,7 @@ import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
 export default function StartupPage({navigation}: any) {
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.topHalf}>
+            <TouchableOpacity style={styles.topHalf} onPress={() => navigation.navigate("StartupSearch")}>
                 <Image
                     source={require('../assets/images/stroller.png')}
                     style={styles.image}

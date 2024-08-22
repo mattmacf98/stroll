@@ -1,9 +1,12 @@
 import { BuroughCard } from "@/components/Burough/BuroughCard";
-import { TimeIndicator } from "@/components/TimeIndicator/TimeIndicator";
+import { TimeIndicator } from "@/components/TimeIndicators/TimeIndicator";
 import { Buroughs, StrollContext } from "@/contexts/StrollContext";
 import { useContext } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity} from "react-native";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { TimeIndicatorRange } from "@/components/TimeIndicators/TimeRangeIndicator";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const profileImages = [
     require('../assets/images/profile_pics/0.png'),
@@ -17,31 +20,9 @@ const profileImages = [
     require('../assets/images/profile_pics/8.png'),
   ];
 
-  const formatTime = (date: Date): string => {
-    let hours = date.getHours();
-    const minutes = date.getMinutes();
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    
-    hours = hours % 12;
-    hours = hours ? hours : 12; // The hour '0' should be '12'
-    
-    const minutesStr = minutes < 10 ? '0' + minutes : minutes.toString();
-    return `${hours}:${minutesStr}${ampm}`;
-  };
-
-const  getTimeRange = (isoString: string, minuteDuration: number): string  => {
-    const startDate = new Date(isoString);
-    const endDate = new Date(startDate.getTime() + minuteDuration * 60000);
-
-    // Create the time range string
-    const startTimeStr = formatTime(startDate);
-    const endTimeStr = formatTime(endDate);
-
-    return `${startTimeStr}-${endTimeStr}`;
-}
-
-export default function StrollSearchResultsPage() {
-    const {buroughIndex, duration, strolls} = useContext(StrollContext);
+export default function StrollSearchResultsPage({navigation}: any) {
+    const {buroughIndex, duration} = useContext(StrollContext);
+    const strolls = useQuery(api.strolls.filter, {minutes: BigInt(duration), burough: Buroughs[buroughIndex].name})
 
     return (
         <View style={styles.container}>
@@ -49,8 +30,9 @@ export default function StrollSearchResultsPage() {
                 <TimeIndicator minutes={duration} textSize={24} iconSize={96} />
                 <BuroughCard image={Buroughs[buroughIndex].image} name={Buroughs[buroughIndex].name} />
             </View>
+            <View style={{width: "100%", height: 1, backgroundColor: "#CECECE"}}/>
             {
-                strolls.length === 0 &&
+                strolls === undefined || strolls.length === 0 &&
                 <View style={{flex: 4, paddingTop: 64, alignItems: "center"}}>
                     <Image
                         source={require('../assets/images/no_walks.png')}
@@ -60,17 +42,13 @@ export default function StrollSearchResultsPage() {
                     <Text style={{textAlign: "center", fontSize: 32, fontWeight: "bold"}}>No Matching</Text>
                     <Text style={{textAlign: "center", fontSize: 32, fontWeight: "bold"}}>Walks</Text>
 
-                    <TouchableOpacity style={styles.strollingButton}>
-                        <Text style={styles.strollingButtonText}>Start Your Own</Text>
-                    </TouchableOpacity>
-
                 </View>
             }
             {
-                strolls.length > 0 &&
+                strolls && strolls.length > 0 &&
                 <View style={{flex: 4, alignItems: "center", flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', padding: 32}}>
                     {strolls.map((stroll, index) => (
-                        <View key={index} style={{backgroundColor: "#F8F8F8", borderWidth:1, borderRadius: 10, marginTop: 32,
+                        <TouchableOpacity key={index} onPress={() => {navigation.navigate("StrollDetail", {strollId: stroll._id})}} style={{backgroundColor: "#F8F8F8", borderWidth:1, borderRadius: 10, marginTop: 32,
                         borderColor:"#F2F2F2", width: 160, height: 160, padding: 8, shadowColor: "#000", shadowOpacity: 0.25, shadowOffset: {width: 0, height: 4}}}>
                             <Text style={{textAlign: "center", fontWeight: "bold", fontSize: 20, flex: 2}}>{stroll.title}</Text>
 
@@ -91,18 +69,18 @@ export default function StrollSearchResultsPage() {
                             <View style={{flexDirection: "row", justifyContent: "space-between"}}>
                                 <View style={{flexDirection: "row", justifyContent: "center"}}>
                                     <FontAwesome6 name="person" size={16} color="black"/>
-                                    <Text style={{fontSize: 8, fontWeight: "bold", marginTop:4, marginLeft: 4}}>{stroll.strollers.length}/{stroll.maxSize}</Text>
+                                    <Text style={{fontSize: 8, fontWeight: "bold", marginTop:4, marginLeft: 4}}>{stroll.strollers.length}/{Number(stroll.maxSize)}</Text>
                                 </View>
                                 
-                                <View style={{flexDirection: "row"}}>
-                                    <FontAwesome6 name="clock" size={16} color="black" />
-                                    <Text style={{fontSize: 8, fontWeight: "bold", marginTop:4, marginLeft: 4}}>{getTimeRange(stroll.startTime, stroll.minutes)}</Text>
-                                </View>      
+                                <TimeIndicatorRange startTime={stroll.startTime} minutes={Number(stroll.minutes)}/>   
                             </View>    
-                        </View>
+                        </TouchableOpacity>
                     ))}
                 </View>
             }
+            <TouchableOpacity style={styles.strollingButton} onPress={() => navigation.navigate("CreateStroll")}>
+                <Text style={styles.strollingButtonText}>Start Your Own</Text>
+            </TouchableOpacity>
         </View>
     )
 }
@@ -116,21 +94,20 @@ const styles = StyleSheet.create({
     searchParamsContainer: {
         width: "100%",
         paddingTop: 16,
+        paddingBottom: 32,
         flex: 1,
         flexDirection: "row",
-        justifyContent: 'space-around',
-        borderBottomWidth: 1,
-        borderBottomColor: "#BABABA"
+        justifyContent: 'space-around'
     },
     image: {
         height: "60%"
     },
     strollingButton: {
-        marginTop: 64,
+        marginBottom: 64,
         backgroundColor: '#65558F',
-        width: 250,
+        width: 200,
         paddingVertical: 15,
-        borderRadius: 10,
+        borderRadius: 25,
         alignItems: 'center',
       },
     strollingButtonText: {

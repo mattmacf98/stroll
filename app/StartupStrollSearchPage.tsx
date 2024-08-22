@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { Buroughs, StrollContext } from "../contexts/StrollContext";
-import { TimeIndicator } from "@/components/TimeIndicator/TimeIndicator";
+import { TimeIndicator } from "@/components/TimeIndicators/TimeIndicator";
 import { BuroughCard } from "@/components/Burough/BuroughCard";
 
 export default function StartupStrollSearchPage({navigation}: any) {
@@ -105,4 +105,4 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       textAlign: "center"
     }
-  });
+});

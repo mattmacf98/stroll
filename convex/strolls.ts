@@ -22,7 +22,7 @@ export const create = mutation({
      },
     handler: async (ctx, { owner, title, maxSize, burough, lng, lat, startTime, minutes }) => {
       const newStrollId = await ctx.db.insert("strolls", { 
-        owner: owner, maxSize: maxSize, strollers: [], 
+        owner: owner, maxSize: maxSize, strollers: [owner], 
         title: title,
         location: {
             burough: burough,

@@ -1,19 +1,16 @@
+import { api } from "@/convex/_generated/api";
+import { useQuery } from "convex/react";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { ImageSourcePropType } from "react-native";
 
-interface IStroll {
+interface IMessage {
+  _id: string,
+  stroll: string,
   owner: string,
-  title: string,
-  strollers: string[],
-  location: {
-    burough: string,
-    lat: number,
-    lng: number
-  },
-  startTime: string,
-  minutes: number,
-  maxSize: number
+  time: string,
+  content: string, 
 }
+
 interface StrollState {
     //SEARCHING
     buroughIndex: number;
@@ -22,7 +19,7 @@ interface StrollState {
     setDuration: (duration: number) => void;
 
     // RESULTS
-    strolls: IStroll[]
+    messages: IMessage[];
 }
 
 export interface IBurough {
@@ -55,77 +52,42 @@ export const StrollContext = createContext<StrollState>(
     duration: -1, 
     setBuroughIndex: () => null, 
     setDuration: () => null, 
-    strolls:[]
+    messages: []
   });
 
 export const StrollProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [buroughIndex, setBuroughIndex] = useState<number>(0);
     const [duration, setDuration] = useState<number>(30);
-    const [strolls, setStrolls] = useState<IStroll[]>([
+    const [messages, setMessages] = useState<IMessage[]>([
       {
-        owner: "",
-        title: "Bob's Walk",
-        strollers: ['d'],
-        location: {
-          burough: "",
-          lat: 0,
-          lng: 0
-        },
-        startTime: "2024-07-30T09:00:00Z",
-        minutes: 60,
-        maxSize: 2
+        _id: "1",
+        content: "Where Should We Meet?",
+        owner: "1",
+        stroll: "1",
+        time: "2024-07-30T09:00:00Z"
       },
       {
-        owner: "",
-        title: "Matthew's Walk",
-        strollers: ['d', 's'],
-        location: {
-          burough: "",
-          lat: 0,
-          lng: 0
-        },
-        startTime: "2024-07-30T12:00:00Z",
-        minutes: 30,
-        maxSize: 3
+        _id: "1",
+        content: "Centrel Park?",
+        owner: "1",
+        stroll: "1",
+        time: "2024-07-30T09:02:00Z"
       },
       {
-        owner: "",
-        title: "Cindy's Walk",
-        strollers: ['s'],
-        location: {
-          burough: "",
-          lat: 0,
-          lng: 0
-        },
-        startTime: "2024-07-30T15:30:00Z",
-        minutes: 30,
-        maxSize: 2
-      },
-      {
-        owner: "",
-        title: "Jack's Walk",
-        strollers: ['s', 's','d'],
-        location: {
-          burough: "",
-          lat: 0,
-          lng: 0
-        },
-        startTime: "2024-07-30T17:30:00Z",
-        minutes: 15,
-        maxSize: 4
-      },
-  ]);
-
-    useEffect(() => {
-      // FETCH MATCHING STROLLS 
-    }, [buroughIndex, duration])
+        _id: "1",
+        content: "👍",
+        owner: "1",
+        stroll: "1",
+        time: "2024-07-30T09:05:00Z"
+      }
+    ]);
   
     const value = {
       buroughIndex,
       duration,
       setBuroughIndex,
       setDuration,
-      strolls
+      messages
     };
   
     return <StrollContext.Provider value={value}>{children}</StrollContext.Provider>;

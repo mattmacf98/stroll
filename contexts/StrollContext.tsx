@@ -17,9 +17,11 @@ interface StrollState {
     duration: number;
     setBuroughIndex: (buroughIndex: number) => void;
     setDuration: (duration: number) => void;
+    setUserId: (id: string) => void;
 
     // RESULTS
     messages: IMessage[];
+    userId: string
 }
 
 export interface IBurough {
@@ -52,12 +54,15 @@ export const StrollContext = createContext<StrollState>(
     duration: -1, 
     setBuroughIndex: () => null, 
     setDuration: () => null, 
+    setUserId: () => null,
+    userId: "",
     messages: []
   });
 
 export const StrollProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [buroughIndex, setBuroughIndex] = useState<number>(0);
     const [duration, setDuration] = useState<number>(30);
+    const [userId, setUserId] = useState("");
     const [messages, setMessages] = useState<IMessage[]>([
       {
         _id: "1",
@@ -87,6 +92,8 @@ export const StrollProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       duration,
       setBuroughIndex,
       setDuration,
+      setUserId,
+      userId,
       messages
     };
   

@@ -48,8 +48,8 @@ export default function StrollSearchResultsPage({navigation}: any) {
                 strolls && strolls.length > 0 &&
                 <View style={{flex: 4, alignItems: "center", flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', padding: 32}}>
                     {strolls.map((stroll, index) => (
-                        <TouchableOpacity key={index} onPress={() => {navigation.navigate("StrollDetail", {strollId: stroll._id})}} style={{backgroundColor: "#F8F8F8", borderWidth:1, borderRadius: 10, marginTop: 32,
-                        borderColor:"#F2F2F2", width: 160, height: 160, padding: 8, shadowColor: "#000", shadowOpacity: 0.25, shadowOffset: {width: 0, height: 4}}}>
+                        <TouchableOpacity key={index} onPress={() => {navigation.navigate("StrollDetail", {strollId: stroll._id})}} style={{backgroundColor: "#F8F8F8", borderWidth:1, borderRadius: 10, margin: 16,
+                        borderColor:"#F2F2F2", width: 150, height: 150, padding: 8, shadowColor: "#000", shadowOpacity: 0.25, shadowOffset: {width: 0, height: 4}}}>
                             <Text style={{textAlign: "center", fontWeight: "bold", fontSize: 20, flex: 2}}>{stroll.title}</Text>
 
                             <View style={{flexDirection: "row", marginLeft: 16, flex: 3}}>

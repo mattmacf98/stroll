@@ -7,7 +7,6 @@ import TimePicker from 'react-native-wheel-time-picker';
 import Slider from '@react-native-community/slider';
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 
 
 const MILLISECONDS_PER_HOUR = 60 * 60 * 1000;

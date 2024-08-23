@@ -16,6 +16,7 @@ import type {
 } from "convex/server";
 import type * as CustomPassword from "../CustomPassword.js";
 import type * as auth from "../auth.js";
+import type * as crons from "../crons.js";
 import type * as http from "../http.js";
 import type * as messages from "../messages.js";
 import type * as strolls from "../strolls.js";
@@ -32,6 +33,7 @@ import type * as users from "../users.js";
 declare const fullApi: ApiFromModules<{
   CustomPassword: typeof CustomPassword;
   auth: typeof auth;
+  crons: typeof crons;
   http: typeof http;
   messages: typeof messages;
   strolls: typeof strolls;

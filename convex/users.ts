@@ -21,6 +21,16 @@ export const signedInUser = query({
 })
 
 
+export const resetStrollStatus = mutation({
+    args: {},
+    handler: async (ctx, {}) => {
+        const users = await ctx.db.query("users").collect();
+        for (const user of users) {
+            await ctx.db.patch(user._id, {strolling: false})
+        }
+    }
+})
+
 
 export const create = mutation({
     args: { name: v.string(), profilePicId: v.int64() },

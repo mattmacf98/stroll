@@ -1,9 +1,20 @@
+import { api } from "@/convex/_generated/api";
+import { useMutation, useQuery } from "convex/react";
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
 
 export default function StartupPage({navigation}: any) {
+    const user = useQuery(api.users.signedInUser);
+    const setStrolling = useMutation(api.users.setStrolling);
+
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.topHalf} onPress={() => navigation.navigate("StartupSearch")}>
+            <TouchableOpacity style={styles.topHalf} onPress={() => {
+                    if (user) {
+                        setStrolling({id: user._id, strolling: true})
+                        navigation.navigate("StartupSearch")
+                    }
+                    
+                }}>
                 <Image
                     source={require('../assets/images/stroller.png')}
                     style={styles.image}

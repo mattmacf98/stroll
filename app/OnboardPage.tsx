@@ -1,8 +1,7 @@
-import { StrollContext } from "@/contexts/StrollContext";
 import { api } from "@/convex/_generated/api";
 import { useAuthActions } from "@convex-dev/auth/dist/react";
 import { useQuery } from "convex/react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Image, Text, View, StyleSheet, TouchableOpacity, TextInput } from "react-native";
 
 enum AuthMode {
@@ -22,7 +21,7 @@ const profileImages = [
 ];
 
 export default function OnboardPage({navigation}: any) {
-  const [authMode, setAuthMode] = useState<AuthMode>(AuthMode.SIGN_UP);
+  const [authMode, setAuthMode] = useState<AuthMode>(AuthMode.SIGN_IN);
 
   const switchAuthMode = () => {
     authMode === AuthMode.SIGN_IN ? setAuthMode(AuthMode.SIGN_UP) : setAuthMode(AuthMode.SIGN_IN);
@@ -44,7 +43,7 @@ const SignUpForm = (props: IAuthFormProps) => {
   const [nameText, setNameText] = useState('');
   const [password, setPassword] = useState('');
   const { signIn } = useAuthActions();
-
+  
   const handleImageTap = () => {
     setProfilePicIndex((prevIndex) => (prevIndex + 1) % profileImages.length);
   }
@@ -88,7 +87,7 @@ const SignUpForm = (props: IAuthFormProps) => {
           <TouchableOpacity style={styles.strollingButton} onPress={ async () => {
               const result = await signIn("password", {email: nameText, name: nameText, password: password, profilePicId: BigInt(profilePicIndex), flow: "signUp"});
               if (result.signingIn) {
-                props.navigation.navigate("Startup");
+                props.navigation.navigate("StartupSearch");
               }
             }}>
             <Text style={styles.strollingButtonText}>Start Strolling</Text>
@@ -103,6 +102,7 @@ const SignInForm = (props: IAuthFormProps) => {
   const [password, setPassword] = useState('');
   const { signIn } = useAuthActions();
   const profilePicId = useRef<number>(0);
+  const user = useQuery(api.users.signedInUser);
 
   useEffect(() => {
     profilePicId.current = Math.floor(Math.random() * profileImages.length)
@@ -148,7 +148,11 @@ const SignInForm = (props: IAuthFormProps) => {
           <TouchableOpacity style={styles.strollingButton} onPress={ async () => {
               const result = await signIn("password", {email: nameText, password: password, flow: "signIn"});
               if (result.signingIn) {
-                props.navigation.navigate("Startup");
+                if (user?.strolling) {
+                  props.navigation.navigate("StartupSearch");
+                } else {
+                  props.navigation.navigate("Startup");
+                }
               }
             }}>
             <Text style={styles.strollingButtonText}>Start Strolling</Text>

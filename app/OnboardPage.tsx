@@ -1,10 +1,9 @@
 import { StrollContext } from "@/contexts/StrollContext";
 import { api } from "@/convex/_generated/api";
-import { useMutation, useQuery } from "convex/react";
+import { useAuthActions } from "@convex-dev/auth/dist/react";
+import { useQuery } from "convex/react";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Dimensions, Image, Text, View, StyleSheet, TouchableOpacity, TextInput } from "react-native";
-
-const { height } = Dimensions.get('window');
+import { Image, Text, View, StyleSheet, TouchableOpacity, TextInput } from "react-native";
 
 enum AuthMode {
   SIGN_IN,
@@ -23,7 +22,7 @@ const profileImages = [
 ];
 
 export default function OnboardPage({navigation}: any) {
-  const [authMode, setAuthMode] = useState<AuthMode>(AuthMode.SIGN_UP)
+  const [authMode, setAuthMode] = useState<AuthMode>(AuthMode.SIGN_UP);
 
   const switchAuthMode = () => {
     authMode === AuthMode.SIGN_IN ? setAuthMode(AuthMode.SIGN_UP) : setAuthMode(AuthMode.SIGN_IN);
@@ -36,16 +35,15 @@ export default function OnboardPage({navigation}: any) {
   }
 }
 
-interface ISignUpFormProps {
-  navigation: any,
+interface IAuthFormProps {
   switchAuthMode: () => void
+  navigation: any
 }
-const SignUpForm = (props: ISignUpFormProps) => {
+const SignUpForm = (props: IAuthFormProps) => {
   const [profilePicIndex, setProfilePicIndex] = useState(0);
   const [nameText, setNameText] = useState('');
   const [password, setPassword] = useState('');
-  const {setUserId} =  useContext(StrollContext);
-  const createUser = useMutation(api.users.create);
+  const { signIn } = useAuthActions();
 
   const handleImageTap = () => {
     setProfilePicIndex((prevIndex) => (prevIndex + 1) % profileImages.length);
@@ -88,9 +86,10 @@ const SignUpForm = (props: ISignUpFormProps) => {
       
       {nameText.length > 0 && password.length > 0 && (
           <TouchableOpacity style={styles.strollingButton} onPress={ async () => {
-              const userId = await createUser({name: nameText, profilePicId: BigInt(profilePicIndex)});
-              setUserId(userId);
-              props.navigation.navigate("Startup");
+              const result = await signIn("password", {email: nameText, name: nameText, password: password, profilePicId: BigInt(profilePicIndex), flow: "signUp"});
+              if (result.signingIn) {
+                props.navigation.navigate("Startup");
+              }
             }}>
             <Text style={styles.strollingButtonText}>Start Strolling</Text>
           </TouchableOpacity>
@@ -99,15 +98,10 @@ const SignUpForm = (props: ISignUpFormProps) => {
   )
 }
 
-interface ISignInFormProps {
-  navigation: any,
-  switchAuthMode: () => void,
-}
-const SignInForm = (props: ISignInFormProps) => {
+const SignInForm = (props: IAuthFormProps) => {
   const [nameText, setNameText] = useState('');
   const [password, setPassword] = useState('');
-  const {setUserId} =  useContext(StrollContext);
-  const getUserByName = useQuery(api.users.getByName, {name: nameText});
+  const { signIn } = useAuthActions();
   const profilePicId = useRef<number>(0);
 
   useEffect(() => {
@@ -152,12 +146,10 @@ const SignInForm = (props: ISignInFormProps) => {
 
       {nameText.length > 0 && password.length > 0 && (
           <TouchableOpacity style={styles.strollingButton} onPress={ async () => {
-              if (getUserByName && getUserByName.length > 0) {
-                const user = getUserByName[0];
-                setUserId(user._id);
+              const result = await signIn("password", {email: nameText, password: password, flow: "signIn"});
+              if (result.signingIn) {
                 props.navigation.navigate("Startup");
               }
-              
             }}>
             <Text style={styles.strollingButtonText}>Start Strolling</Text>
           </TouchableOpacity>

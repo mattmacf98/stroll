@@ -23,11 +23,10 @@ export default function CreateStrollPage({navigation}: any) {
     const [timeValue, setTimeValue] = useState(Date.now() % MILLISECONDS_PER_DAY);
     const [maxStrollers, setMaxStrollers] = useState(1);
     const createStroll = useMutation(api.strolls.create);
-    const users = useQuery(api.users.get, {id: userId as Id<"users">})
+    const user = useQuery(api.users.signedInUser)
 
     const handleButtonPress = async () => {
-        if (users && users.length > 0) {
-            const user = users[0];
+        if (user) {
             const strollId =  await createStroll(
                 {
                   owner: user._id,

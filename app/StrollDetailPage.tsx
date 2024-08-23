@@ -20,12 +20,13 @@ const profileImages = [
 ];
 
 export default function StrollDetailPage({navigation, route}: {navigation: any, route: any}) {
-  const {messages, userId} = useContext(StrollContext);
+  const {messages} = useContext(StrollContext);
   const strolls = useQuery(api.strolls.get, {strollId: route.params.strollId})
   const joinStroll = useMutation(api.strolls.join);
   const leaveStroll = useMutation(api.strolls.unjoin);
   const deleteStroll = useMutation(api.strolls.remove);
   const [randomProfilePicIds, setRandomProfilePicIds] = useState<number[]>([])
+  const user = useQuery(api.users.signedInUser);
 
   useEffect(() => {
     const ids = []
@@ -37,7 +38,7 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
 
   if (strolls && strolls.length  === 1) {
     const stroll = strolls[0];
-    const isOwner = String(stroll.owner) === userId;
+    const isOwner = String(stroll.owner) === user?._id;
     return (
       <View style={styles.container}>
           <Text style={styles.text}>{stroll.title}</Text>
@@ -85,17 +86,17 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
                </View>
             }
             {
-              !isOwner && stroll.strollers.length < stroll.maxSize && !stroll.strollers.includes(userId as Id<"users">) &&
+              !isOwner && user && stroll.strollers.length < stroll.maxSize && !stroll.strollers.includes(user._id) &&
               <View style={{flex: 1, position: "absolute", bottom: 0}}>
-                  <TouchableOpacity style={styles.strollingButton} onPress={() => joinStroll({strollId: stroll._id, userId: userId as Id<"users">})}>
+                  <TouchableOpacity style={styles.strollingButton} onPress={() => joinStroll({strollId: stroll._id, userId: user._id})}>
                       <Text style={styles.strollingButtonText}>Join Stroll</Text>
                   </TouchableOpacity>
               </View>
             }
             {
-              !isOwner && stroll.strollers.includes(userId as Id<"users">) &&
+              !isOwner && user && stroll.strollers.includes(user._id) &&
               <View style={{flex: 1, position: "absolute", bottom: 0}}>
-                  <TouchableOpacity style={styles.leaveStrollButton} onPress={() => leaveStroll({strollId: stroll._id, userId: userId as Id<"users">})}>
+                  <TouchableOpacity style={styles.leaveStrollButton} onPress={() => leaveStroll({strollId: stroll._id, userId: user._id})}>
                       <Text style={styles.strollingButtonText}>Leave Stroll</Text>
                   </TouchableOpacity>
               </View>

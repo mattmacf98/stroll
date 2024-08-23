@@ -1,5 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const get = query({
     args: {id: v.id("users")},
@@ -8,22 +9,25 @@ export const get = query({
     }
 })
 
-export const getByName = query({
-    args: {name: v.string()},
-    handler: async (ctx, {name}) => {
-        return await ctx.db.query("users").filter((q) => q.eq(q.field("name"), name)).collect();
+export const signedInUser = query({
+    args: {},
+    handler: async (ctx, {}) => {
+        const userId = await getAuthUserId(ctx);
+        if (userId === null) {
+            return null
+        }
+        return await ctx.db.get(userId)
     }
 })
+
+
 
 export const create = mutation({
     args: { name: v.string(), profilePicId: v.int64() },
     handler: async (ctx, { name, profilePicId }) => {
-      const users = await ctx.db.query("users").filter((q) => q.eq(q.field("name"), name)).collect();
-      if (users && users.length > 0) {
-        throw new ConvexError("Invalid Authentication");
-      }
-      const newUserId = await ctx.db.insert("users", { name: name, profilePicId: profilePicId, strolls: [], strolling: true, lastUpdatedTimestamp: new Date().toISOString()});
-      return newUserId;
+        const userId = await getAuthUserId(ctx);
+        await ctx.db.patch(userId!, { name: name, profilePicId: profilePicId, strolls: [], strolling: true, lastUpdatedTimestamp: new Date().toISOString()});
+        return userId;
     }
 });
 
@@ -45,7 +49,7 @@ export const addStroll = mutation({
         const user = users[0];
 
         const strolls = user.strolls;
-        if (!strolls.includes(strollId)) {
+        if (strolls && !strolls.includes(strollId)) {
             ctx.db.patch(userId, {strolls: [...strolls, strollId]});
         }
 
@@ -64,7 +68,7 @@ export const leaveStroll = mutation({
         const user = users[0];
 
         let strolls = user.strolls;
-        if (strolls.includes(strollId)) {
+        if (strolls && strolls.includes(strollId)) {
             strolls = strolls.filter(s => s != strollId);
             ctx.db.patch(userId, {strolls: strolls});
         }

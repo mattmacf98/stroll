@@ -15,6 +15,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@convex-dev/auth": "^0.0.61",
     "@expo/vector-icons": "^14.0.2",
     "@miblanchard/react-native-slider": "^2.6.0",
     "@react-native-community/slider": "^4.5.2",
@@ -41,7 +42,8 @@
     "react-native-screens": "3.31.1",
     "react-native-slider": "^0.11.0",
     "react-native-web": "~0.19.10",
-    "react-native-wheel-time-picker": "^0.4.3"
+    "react-native-wheel-time-picker": "^0.4.3",
+    "expo-secure-store": "~13.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

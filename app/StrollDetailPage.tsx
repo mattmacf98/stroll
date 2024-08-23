@@ -1,9 +1,10 @@
 import { formatTime, TimeIndicatorRange, TimeIndicatorRangeLarge } from "@/components/TimeIndicators/TimeRangeIndicator";
 import { Buroughs, StrollContext } from "@/contexts/StrollContext";
 import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
+import { Id } from "@/convex/_generated/dataModel";
+import { useMutation, useQuery } from "convex/react";
 import { useContext } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 
 const profileImages = [
   require('../assets/images/profile_pics/0.png'),
@@ -18,8 +19,9 @@ const profileImages = [
 ];
 
 export default function StrollDetailPage({route}: {route: any}) {
-  const {messages} = useContext(StrollContext);
+  const {messages, userId} = useContext(StrollContext);
   const strolls = useQuery(api.strolls.get, {strollId: route.params.strollId})
+  const joinStroll = useMutation(api.strolls.join);
 
   if (strolls && strolls.length  === 1) {
     const stroll = strolls[0];
@@ -30,7 +32,7 @@ export default function StrollDetailPage({route}: {route: any}) {
 
           <Image
             source={Buroughs[0].image}
-            style={{width: 300, height: 300, marginTop: 16, borderRadius: 10}}
+            style={{width: 250, height: 250, marginTop: 16, borderRadius: 10}}
           />
 
             <View style={{flexDirection: "row", marginTop: 32}}>
@@ -57,6 +59,15 @@ export default function StrollDetailPage({route}: {route: any}) {
                     </View>
                   ))}
             </View>
+
+            {
+              stroll.strollers.length < stroll.maxSize && !stroll.strollers.includes(userId as Id<"users">) &&
+              <View style={{flex: 1, position: "absolute", bottom: 0}}>
+                  <TouchableOpacity style={styles.strollingButton} onPress={() => joinStroll({strollId: stroll._id, userId: userId as Id<"users">})}>
+                      <Text style={styles.strollingButtonText}>Join Stroll</Text>
+                  </TouchableOpacity>
+              </View>
+            }
       </View>
     )
   }
@@ -74,5 +85,18 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       textAlign: "center",
       marginBottom: 16
-    }
+    },
+    strollingButton: {
+      marginBottom: 64,
+      backgroundColor: '#65558F',
+      width: 128,
+      paddingVertical: 15,
+      borderRadius: 25,
+      alignItems: 'center'
+    },
+  strollingButtonText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: 'bold',
+  }
   });

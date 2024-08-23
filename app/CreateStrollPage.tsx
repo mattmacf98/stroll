@@ -5,8 +5,9 @@ import React, { useContext, useState } from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import TimePicker from 'react-native-wheel-time-picker';
 import Slider from '@react-native-community/slider';
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 
 
 const MILLISECONDS_PER_HOUR = 60 * 60 * 1000;
@@ -18,22 +19,25 @@ const getIsoStringForSelectedTime = (ms: number) => {
 }
 
 export default function CreateStrollPage({navigation}: any) {
-    const {buroughIndex, duration } = useContext(StrollContext);
+    const {buroughIndex, duration, userId } = useContext(StrollContext);
     const [timeValue, setTimeValue] = useState(Date.now() % MILLISECONDS_PER_DAY);
     const [maxStrollers, setMaxStrollers] = useState(1);
     const createStroll = useMutation(api.strolls.create);
+    const users = useQuery(api.users.get, {id: userId as Id<"users">})
 
     const handleButtonPress = async () => {
-        const strollId =  await createStroll(
-            {
-              owner: "jh715tq7g52ye3602pab9xkr196zana3" as Id<"users">,
-              title: "Matt's Walk", burough: Buroughs[buroughIndex].name, 
-              lat: 0, lng: 0, startTime: getIsoStringForSelectedTime(timeValue), minutes: BigInt(duration),
-              maxSize: BigInt(maxStrollers) 
-            }
-          );
-        console.log(strollId);
-        navigation.navigate("StrollDetail", {strollId: strollId});
+        if (users && users.length > 0) {
+            const user = users[0];
+            const strollId =  await createStroll(
+                {
+                  owner: user._id,
+                  title: `${user.name}'s Stroll`, burough: Buroughs[buroughIndex].name, 
+                  lat: 0, lng: 0, startTime: getIsoStringForSelectedTime(timeValue), minutes: BigInt(duration),
+                  maxSize: BigInt(maxStrollers) 
+                }
+              );
+            navigation.navigate("StrollDetail", {strollId: strollId});
+        }
     }
 
     return (

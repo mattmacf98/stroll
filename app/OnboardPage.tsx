@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { StrollContext } from "@/contexts/StrollContext";
+import { api } from "@/convex/_generated/api";
+import { useMutation, useQuery } from "convex/react";
+import { useContext, useState } from "react";
 import { Dimensions, Image, Text, View, StyleSheet, TouchableOpacity, TextInput } from "react-native";
 
 const { height } = Dimensions.get('window');
 
 export default function OnboardPage({navigation}: any) {
+  const {setUserId} =  useContext(StrollContext);
   const [profilePicIndex, setProfilePicIndex] = useState(0);
   const [nameText, setNameText] = useState('');
+  const createUser = useMutation(api.users.create);
+  const getUserByName = useQuery(api.users.getByName, {name: nameText})
   const profileImages = [
     require('../assets/images/profile_pics/0.png'),
     require('../assets/images/profile_pics/1.png'),
@@ -44,7 +50,16 @@ export default function OnboardPage({navigation}: any) {
         />
       </View>
       {nameText.length > 0 && (
-          <TouchableOpacity style={styles.strollingButton} onPress={() => navigation.navigate("Startup")}>
+          <TouchableOpacity style={styles.strollingButton} onPress={ async () => {
+              if (getUserByName && getUserByName.length > 0) {
+                setUserId(getUserByName[0]._id)
+              } else {
+                const userId = await createUser({name: nameText, profilePicId: BigInt(profilePicIndex)});
+                setUserId(userId);
+
+              }
+              navigation.navigate("Startup");
+            }}>
             <Text style={styles.strollingButtonText}>Start Strolling</Text>
           </TouchableOpacity>
       )}

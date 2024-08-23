@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
 export const get = query({
@@ -8,10 +8,21 @@ export const get = query({
     }
 })
 
+export const getByName = query({
+    args: {name: v.string()},
+    handler: async (ctx, {name}) => {
+        return await ctx.db.query("users").filter((q) => q.eq(q.field("name"), name)).collect();
+    }
+})
+
 export const create = mutation({
     args: { name: v.string(), profilePicId: v.int64() },
     handler: async (ctx, { name, profilePicId }) => {
-      const newUserId = await ctx.db.insert("users", { name: name, profilePicId: profilePicId, strolls: [], lastUpdatedTimestamp: new Date().toISOString()});
+      const users = await ctx.db.query("users").filter((q) => q.eq(q.field("name"), name)).collect();
+      if (users && users.length > 0) {
+        throw new ConvexError("Invalid Authentication");
+      }
+      const newUserId = await ctx.db.insert("users", { name: name, profilePicId: profilePicId, strolls: [], strolling: true, lastUpdatedTimestamp: new Date().toISOString()});
       return newUserId;
     }
 });

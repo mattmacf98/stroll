@@ -5,22 +5,19 @@ import { TimeIndicator } from "@/components/TimeIndicators/TimeIndicator";
 import { BuroughCard } from "@/components/Burough/BuroughCard";
 
 export default function StartupStrollSearchPage({navigation}: any) {
-    const [selectedMinutes, setSelectedMinutes] = useState(-1);
-    const [selectedBuroughIndex, setSelectedBuroughIndex] = useState(-1)
-    const {setBuroughIndex, setDuration} = useContext(StrollContext);
+    const {setBuroughIndex, setDuration, buroughIndex, duration} = useContext(StrollContext);
+
 
     useEffect(() => {
-        if (selectedBuroughIndex !== -1) {
-            setBuroughIndex(selectedBuroughIndex)
-            setDuration(selectedMinutes)
+        if (buroughIndex !== -1) {
             navigation.navigate("StrollSearchResults")
         }
-    }, [selectedBuroughIndex])
+    }, [buroughIndex])
 
-    if (selectedMinutes === -1) {
-        return <HowLongSelection setDuration={(mins: number) => setSelectedMinutes(mins)}/>
-    } else if (selectedBuroughIndex === -1) {
-       return <WhereSelection minutes={selectedMinutes} pickBurough={(buroughIndex: number) => setSelectedBuroughIndex(buroughIndex)}/>
+    if (duration === -1) {
+        return <HowLongSelection setDuration={(mins: number) => setDuration(mins)}/>
+    } else if (buroughIndex === -1) {
+       return <WhereSelection minutes={duration} pickBurough={(buroughIndex: number) => setBuroughIndex(buroughIndex)}/>
     }
 }
 

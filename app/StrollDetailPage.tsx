@@ -1,11 +1,9 @@
-import { formatTime, TimeIndicatorRange, TimeIndicatorRangeLarge } from "@/components/TimeIndicators/TimeRangeIndicator";
-import { Buroughs, StrollContext } from "@/contexts/StrollContext";
+import { formatTime, TimeIndicatorRangeLarge } from "@/components/TimeIndicators/TimeRangeIndicator";
+import { Buroughs } from "@/contexts/StrollContext";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
-import { unjoin } from "@/convex/strolls";
 import { useMutation, useQuery } from "convex/react";
-import { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { useEffect, useState } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, NativeSyntheticEvent, TextInputSubmitEditingEventData, FlatList } from "react-native";
 
 const profileImages = [
   require('../assets/images/profile_pics/0.png'),
@@ -20,13 +18,16 @@ const profileImages = [
 ];
 
 export default function StrollDetailPage({navigation, route}: {navigation: any, route: any}) {
-  const {messages} = useContext(StrollContext);
   const strolls = useQuery(api.strolls.get, {strollId: route.params.strollId})
   const joinStroll = useMutation(api.strolls.join);
   const leaveStroll = useMutation(api.strolls.unjoin);
   const deleteStroll = useMutation(api.strolls.remove);
-  const [randomProfilePicIds, setRandomProfilePicIds] = useState<number[]>([])
+  const [randomProfilePicIds, setRandomProfilePicIds] = useState<number[]>([]);
+  const [messageContent, setMessageContent] = useState('');
   const user = useQuery(api.users.signedInUser);
+  const messages = useQuery(api.messages.get, {strollId: route.params.strollId});
+  const sendMessage = useMutation(api.messages.send);
+
 
   useEffect(() => {
     const ids = []
@@ -46,7 +47,7 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
 
           <Image
             source={Buroughs[0].image}
-            style={{width: 250, height: 250, marginTop: 16, borderRadius: 10}}
+            style={{width: 225, height: 225, marginTop: 16, borderRadius: 10}}
           />
 
             <View style={{flexDirection: "row", marginTop: 32}}>
@@ -63,16 +64,61 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
             </View>
             <Text style={{fontSize: 16, fontWeight: "bold", position: "relative", color: "#C4C4C4", right: 100, top: 50}}>{stroll.strollers.length}/{Number(stroll.maxSize)}</Text>
 
-            <View style={{borderTopWidth: 1, borderTopColor: "#E6E6E6", width: "100%", position: "relative", top: 60, flex: 1, flexDirection: "column", flexWrap: "wrap"}}>
-                  {messages.map((message, index) => (
-                    <View key={index} style={{width: "100%", marginTop: 16, marginHorizontal: 16}}>
-                      <View style={{flexDirection: "row", borderWidth: 1, borderRadius: 20, borderColor: "#9BA9B0", alignSelf: "flex-start", padding: 16}}>
-                        <Text>{message.content}</Text>
-                        <Text style={{color: "#7E919A", fontSize: 12, marginTop: 2, marginLeft: 6}}>{formatTime(new Date(message.time))}</Text>
-                      </View>  
-                    </View>
-                  ))}
-            </View>
+            {
+              user && stroll.strollers.includes(user._id) &&
+              <View style={{borderTopWidth: 1, borderTopColor: "#E6E6E6", width: "100%", top: 60, flex: 1, maxHeight: 200}}>
+                  <FlatList
+                    style={{height: 50}}
+                    data={messages}
+                    keyExtractor={(message) => message._id}
+                    renderItem={({ item }) => {
+                      if (user._id === item.owner) {
+                        return (
+                          <View style={{flexDirection: "row", borderWidth: 1, borderRadius: 20, borderColor: "#9BA9B0", backgroundColor: "#E5EAFF", alignSelf: "flex-end", padding: 16, marginTop: 16, marginRight: 8}}>
+                            <Text>{item.content}</Text>
+                            <Text style={{color: "#7E919A", fontSize: 12, marginTop: 2, marginLeft: 6}}>{formatTime(new Date(item.time))}</Text>
+                          </View> 
+                        )
+                      } else {
+                        return (
+                          <View style={{flexDirection: "row", borderWidth: 1, borderRadius: 20, borderColor: "#9BA9B0", alignSelf: "flex-start", padding: 16, marginTop: 16, marginLeft: 8}}>
+                            <Text>{item.content}</Text>
+                            <Text style={{color: "#7E919A", fontSize: 12, marginTop: 2, marginLeft: 6}}>{formatTime(new Date(item.time))}</Text>
+                          </View> 
+                        )
+                      }
+                    }}
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                  />
+              </View>
+            }
+            {
+              user && stroll.strollers.includes(user._id) &&
+              <View style={{position: "relative", top: 60}}>
+                 <TextInput
+                    placeholder="Enter Your Message"
+                    style={{
+                      height: 50,
+                      width: 240,
+                      borderColor: '#C1CFFF',
+                      borderWidth: 2,
+                      paddingHorizontal: 10,
+                      marginTop: 8,
+                      borderRadius: 10,
+                      alignSelf: "center"
+                    }}
+                    value={messageContent}
+                    onChangeText={setMessageContent}
+                    onSubmitEditing={async () => {
+                        await sendMessage({stroll: route.params.strollId, user: user._id, content: messageContent});
+                        setMessageContent("");
+                      } 
+                    }
+                  />
+              </View>
+             
+            }
+            
 
             {
                isOwner && 
@@ -109,6 +155,7 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
 const styles = StyleSheet.create({
     container: {
       flex: 1,
+      flexDirection: "column",
       backgroundColor: '#fff',
       alignItems: 'center',
     },
@@ -135,9 +182,9 @@ const styles = StyleSheet.create({
       borderRadius: 25,
       alignItems: 'center'
     },
-  strollingButtonText: {
-      color: 'white',
-      fontSize: 16,
-      fontWeight: 'bold',
-  }
+    strollingButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    }
   });

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const get = query({
     args: {strollId: v.id("strolls")},
@@ -14,6 +15,28 @@ export const remove = mutation({
         await ctx.db.delete(id);
     }
 })
+
+export const getSignedInUserStrolls = query({
+    args: {},
+    handler: async (ctx, {}) => {
+        const userId = await getAuthUserId(ctx);
+        if (userId === null) {
+            return []
+        }
+        const user =  await ctx.db.get(userId);
+        const strolls = [];
+        
+        for (const strollId of user?.strolls || []) {
+            const stroll = await ctx.db.get(strollId);
+            if (stroll) {
+                strolls.push(stroll);
+            }
+        }
+
+        return strolls;
+    }
+})
+
 
 export const create = mutation({
     args: { 
@@ -43,11 +66,13 @@ export const join = mutation({
     },
     handler: async (ctx, {userId, strollId}) => {
         const strolls = await ctx.db.query("strolls").filter((q) => q.eq(q.field("_id"), strollId)).collect();
-        if (strolls.length === 0) {
+        const users = await ctx.db.query("users").filter((q) => q.eq(q.field("_id"), userId)).collect();
+        if (strolls.length === 0 || users.length === 0) {
             // ERROR
             return
         }
         const stroll = strolls[0];
+        const user = users[0];
 
         if (stroll.strollers.length >= stroll.maxSize) {
             // ERROR
@@ -56,6 +81,8 @@ export const join = mutation({
 
         if (!stroll.strollers.includes(userId)) {
             ctx.db.patch(strollId, {strollers: [...stroll.strollers, userId]});
+            const curStrolls = user.strolls || [];
+            ctx.db.patch(userId, {strolls: [...curStrolls, strollId]})
         }
 
         return "DONE";
@@ -69,15 +96,20 @@ export const unjoin = mutation({
     },
     handler: async (ctx, {userId, strollId}) => {
         const strolls = await ctx.db.query("strolls").filter((q) => q.eq(q.field("_id"), strollId)).collect();
-        if (strolls.length === 0) {
+        const users = await ctx.db.query("users").filter((q) => q.eq(q.field("_id"), userId)).collect();
+        if (strolls.length === 0 || users.length === 0) {
             // ERROR
             return
         }
         const stroll = strolls[0];
+        const user = users[0];
 
         if (stroll.strollers.includes(userId)) {
-            const strollers = stroll.strollers.filter(u => u != userId)
+            const strollers = stroll.strollers.filter(u => u !== userId)
             ctx.db.patch(strollId, {strollers: strollers});
+            let strolls = user.strolls || [];
+            strolls = strolls.filter(s => s !== strollId);
+            ctx.db.patch(userId, {strolls: strolls})
         }
 
         return "DONE";

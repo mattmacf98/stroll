@@ -36,8 +36,8 @@ export const TimeIndicatorRange = (props: ITimeIndicatorRangeProps) => (
 )
 
 export const TimeIndicatorRangeLarge = (props: ITimeIndicatorRangeProps) => (
-    <View style={{alignItems: "center"}}>
+    <View style={{flexDirection: "row"}}>
         <FontAwesome6 name="clock" size={32} color="black" />
-        <Text style={{fontSize: 18, marginTop:8}}>{getTimeRange(props.startTime, props.minutes)}</Text>
+        <Text style={{fontSize: 16, fontWeight: "bold", marginTop:4, marginLeft: 4}}>{getTimeRange(props.startTime, props.minutes)}</Text>
     </View>  
 )

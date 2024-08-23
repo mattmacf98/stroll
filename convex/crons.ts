@@ -7,4 +7,6 @@ crons.daily(
     "reset strolling status",
     {hourUTC: 4, minuteUTC: 0}, //12am EDT
     api.users.resetStrollStatus
-)
+);
+
+export default crons;

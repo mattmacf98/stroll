@@ -52,9 +52,9 @@ export default function StrollSearchResultsPage({navigation}: any) {
                         borderColor:"#F2F2F2", width: 150, height: 150, padding: 8, shadowColor: "#000", shadowOpacity: 0.25, shadowOffset: {width: 0, height: 4}}}>
                             <Text style={{textAlign: "center", fontWeight: "bold", fontSize: 20, flex: 2}}>{stroll.title}</Text>
 
-                            <View style={{flexDirection: "row", marginLeft: 16, flex: 3}}>
+                            <View style={{flexDirection: "row", marginLeft: 8, flex: 3}}>
                                 {
-                                    Array.from({ length: stroll.strollers.length }, (_, i) => i).map((index) => (
+                                    Array.from({ length: Math.min(stroll.strollers.length, 4) }, (_, i) => i).map((index) => (
                                         <Image
                                             key={index}
                                             source={profileImages[Math.floor(Math.random() * profileImages.length)]}

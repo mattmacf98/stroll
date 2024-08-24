@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@convex-dev/auth": "^0.0.61",
+    "convex": "^1.14.4",
     "expo": "~51.0.31",
     "expo-router": "~3.5.23",
     "expo-secure-store": "~13.0.2",

@@ -13,7 +13,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "buildNumber": "4",
+      "buildNumber": "8",
       "supportsTablet": true,
       "bundleIdentifier": "com.mattmacf1998.stroll"
     },

@@ -1,34 +1,35 @@
 import { profileImages } from "@/constants/profilePics";
-import { useState } from "react";
-import { View, Text, Image, TouchableOpacity, TextInput } from "react-native";
-import { styles } from "./styles";
+import { useState, useRef, useEffect } from "react";
+import { View, TextInput, TouchableOpacity, Text, Image } from "react-native";
 import { IAuthFormProps } from "./interfaces";
+import { styles } from "./styles";
 import { useAuthActions } from "@convex-dev/auth/dist/react";
 
-export const SignUpForm = (props: IAuthFormProps) => {
-    const [profilePicIndex, setProfilePicIndex] = useState(0);
+export const SignInForm = (props: IAuthFormProps) => {
     const [nameText, setNameText] = useState('');
     const [password, setPassword] = useState('');
+    const profilePicId = useRef<number>(0);
     const { signIn } = useAuthActions();
-    
-    const handleImageTap = () => {
-      setProfilePicIndex((prevIndex) => (prevIndex + 1) % profileImages.length);
-    }
+
+    useEffect(() => {
+      profilePicId.current = Math.floor(Math.random() * profileImages.length)
+    }, [])
+  
     const handleTextInputChange = (text: string) => {
       setNameText(text);
     };
   
     return (
       <View style={styles.container}>
-        <Text style={styles.headerText}>Sign Up</Text>
+        <Text style={styles.headerText}>Sign In</Text>
         <View style={styles.topHalf}>
-          <TouchableOpacity onPress={handleImageTap} style={styles.imageContainer}>
+          <View style={styles.imageContainer}>
             <Image
-                source={profileImages[profilePicIndex]}
+                source={profileImages[profilePicId.current]}
                 style={styles.image}
                 resizeMode="contain"
               />
-          </TouchableOpacity>
+          </View>
           <TextInput
             style={styles.input}
             placeholder="Your Username..."
@@ -38,7 +39,7 @@ export const SignUpForm = (props: IAuthFormProps) => {
         </View>
   
         <View style={{ marginTop: 64}}>
-          <Text style={{textAlign: "center", position: "relative", right: 56, fontSize: 16, fontWeight: "bold"}}>Create Password</Text>
+          <Text style={{textAlign: "center", position: "relative", right: 80, fontSize: 16, fontWeight: "bold"}}>Password</Text>
           <TextInput
             style={styles.paswordInput}
             value={password}
@@ -46,15 +47,20 @@ export const SignUpForm = (props: IAuthFormProps) => {
             secureTextEntry={true}
           />
           <TouchableOpacity onPress={props.switchAuthMode}>
-            <Text style={{textAlign: "center", position: "relative", right: 36, fontSize: 14, marginTop: 8, color: "#C2BECB"}}>Already Have an Account?</Text>
+            <Text style={{textAlign: "center", position: "relative", right: 64, fontSize: 14, marginTop: 8, color: "#C2BECB"}}>Create Account</Text>
           </TouchableOpacity>
         </View>
-        
+  
         {nameText.length > 0 && password.length > 0 && (
             <TouchableOpacity style={styles.strollingButton} onPress={ async () => {
-                const result = await signIn("password", {email: nameText, name: nameText, password: password, profilePicId: BigInt(profilePicIndex), flow: "signUp"});
+                const result = await signIn("password", {email: nameText, password: password, flow: "signIn"});
                 if (result.signingIn) {
-                  console.log("SIGNED UP")
+                    console.log("Signed in")
+                //   if (user?.strolling) {
+                //     props.navigation.navigate("StartupSearch");
+                //   } else {
+                //     props.navigation.navigate("Startup");
+                //   }
                 }
               }}>
               <Text style={styles.strollingButtonText}>Start Strolling</Text>
@@ -62,4 +68,4 @@ export const SignUpForm = (props: IAuthFormProps) => {
         )}
       </View>
     )
-}
+  }

@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
       fontSize: 36,
       fontWeight: "bold",
       textAlign: "center",
-      marginTop: 32,
+      marginTop: 64,
       marginBottom: 32
     },
     container: {

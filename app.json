@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "stroll",
-    "slug": "stroll",
-    "version": "1.0.0",
+    "name": "stroll - don't scroll",
+    "slug": "stroll_dont_scroll",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -13,11 +13,13 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "buildNumber": "2",
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mattmacf1998.stroll"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       }
     },
@@ -32,6 +34,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "9f5901e1-15e4-4ae5-ab94-11701fe92bb6"
+      }
     }
   }
 }

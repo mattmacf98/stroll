@@ -15,7 +15,7 @@ export const formatTime = (date: Date): string => {
 
 const getTimeRange = (isoString: string, minuteDuration: number): string  => {
     const isoStartDate = new Date(isoString);
-    const startDate = new Date(isoStartDate.setHours(isoStartDate.getHours() + 4)); // for conversion to EDT
+    const startDate = new Date(isoStartDate.setHours(isoStartDate.getHours()));
     const endDate = new Date(startDate.getTime() + minuteDuration * 60000);
 
     // Create the time range string

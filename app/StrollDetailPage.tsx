@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, NativeSyntheticEvent, TextInputSubmitEditingEventData, FlatList } from "react-native";
 import { SCREEN_NAME } from "./app";
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 const profileImages = [
   require('../assets/images/profile_pics/0.png'),
@@ -44,8 +45,32 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
     const buroughId = Buroughs.findIndex(b => b.name === stroll.location.burough)
     return (
       <View style={styles.container}>
-          <Text style={styles.text}>{stroll.title}</Text>
-          <TimeIndicatorRangeLarge startTime={stroll.startTime} minutes={Number(stroll.minutes)}/>
+        <View style={{flexDirection: "row"}}>
+            <Text style={styles.text}>
+              {stroll.title}
+            </Text>
+
+            {
+              user && stroll.strollers.includes(user._id) &&
+              <TouchableOpacity style={{marginLeft: 16, marginTop: 16}} onPress={() => {
+                if (isOwner) {
+                  deleteStroll({id: stroll._id});
+                  navigation.navigate(SCREEN_NAME.RESULUTS)
+                } else {
+                  leaveStroll({strollId: stroll._id, userId: user._id})
+                }
+              }}>
+                <FontAwesome6 name="trash-can" size={32}/>
+                <Text style={{position: "relative", right: 4}}>
+                  {isOwner ? "Delete" : "Leave"}
+                </Text>
+              </TouchableOpacity>
+            }
+        </View>
+
+          <View style={{flexDirection: "row"}}>
+            <TimeIndicatorRangeLarge startTime={stroll.startTime} minutes={Number(stroll.minutes)}/>
+          </View>
 
           <Image
             source={Buroughs[buroughId].image}
@@ -65,7 +90,7 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
                 }
             </View>
             <Text style={{fontSize: 16, fontWeight: "bold", position: "relative", color: "#C4C4C4", right: 100, top: 50}}>{stroll.strollers.length}/{Number(stroll.maxSize)}</Text>
-
+          
             {
               user && stroll.strollers.includes(user._id) &&
               <View style={{borderTopWidth: 1, borderTopColor: "#E6E6E6", width: "100%", top: 60, flex: 1, maxHeight: 200}}>
@@ -126,29 +151,10 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
             
 
             {
-               isOwner && 
-               <View style={{flex: 1, position: "absolute", bottom: 0}}>
-                   <TouchableOpacity style={styles.leaveStrollButton} onPress={() => {
-                      deleteStroll({id: stroll._id});
-                      navigation.navigate(SCREEN_NAME.RESULUTS)
-                   }}>
-                       <Text style={styles.strollingButtonText}>Delete Stroll</Text>
-                   </TouchableOpacity>
-               </View>
-            }
-            {
               !isOwner && user && stroll.strollers.length < stroll.maxSize && !stroll.strollers.includes(user._id) &&
               <View style={{flex: 1, position: "absolute", bottom: 0}}>
                   <TouchableOpacity style={styles.strollingButton} onPress={() => joinStroll({strollId: stroll._id, userId: user._id})}>
                       <Text style={styles.strollingButtonText}>Join Stroll</Text>
-                  </TouchableOpacity>
-              </View>
-            }
-            {
-              !isOwner && user && stroll.strollers.includes(user._id) &&
-              <View style={{flex: 1, position: "absolute", bottom: 0}}>
-                  <TouchableOpacity style={styles.leaveStrollButton} onPress={() => leaveStroll({strollId: stroll._id, userId: user._id})}>
-                      <Text style={styles.strollingButtonText}>Leave Stroll</Text>
                   </TouchableOpacity>
               </View>
             }

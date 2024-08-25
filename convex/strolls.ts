@@ -145,3 +145,13 @@ export const filter = query({
         return await strollsQuery.collect();
     }
 })
+
+export const deleteAllStrolls = mutation({
+    args: {},
+    handler: async (ctx, {}) => {
+        const strolls = await ctx.db.query("strolls").collect();
+        for (const stroll of strolls) {
+            await ctx.db.delete(stroll._id)
+        }
+    }
+});

@@ -4,23 +4,15 @@ import { Buroughs, StrollContext } from "@/contexts/StrollContext";
 import React, { useContext, useState } from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import TimePicker from 'react-native-wheel-time-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import Slider from '@react-native-community/slider';
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { SCREEN_NAME } from "./app";
 
-
-const MILLISECONDS_PER_HOUR = 60 * 60 * 1000;
-const MILLISECONDS_PER_DAY = 24 * MILLISECONDS_PER_HOUR;
-
-const getIsoStringForSelectedTime = (ms: number) => {
-    const time = Date.now();
-    return new Date(time - (time % MILLISECONDS_PER_DAY) + ms).toISOString();
-}
-
 export default function CreateStrollPage({navigation}: any) {
     const {buroughIndex, duration, userId } = useContext(StrollContext);
-    const [timeValue, setTimeValue] = useState(Date.now() % MILLISECONDS_PER_DAY);
+    const [date, setDate] = useState(new Date());
     const [maxStrollers, setMaxStrollers] = useState(1);
     const createStroll = useMutation(api.strolls.create);
     const user = useQuery(api.users.signedInUser)
@@ -31,7 +23,7 @@ export default function CreateStrollPage({navigation}: any) {
                 {
                   owner: user._id,
                   title: `${user.name}'s Stroll`, burough: Buroughs[buroughIndex].name, 
-                  lat: 0, lng: 0, startTime: getIsoStringForSelectedTime(timeValue), minutes: BigInt(duration),
+                  lat: 0, lng: 0, startTime: date.toISOString(), minutes: BigInt(duration),
                   maxSize: BigInt(maxStrollers) 
                 }
               );
@@ -56,16 +48,17 @@ export default function CreateStrollPage({navigation}: any) {
                     </View>
 
                     <View style={{marginTop: 64}}>
-                        <TimePicker
-                            timeFormat={['hours12', ':', 'min', 'am/pm']}
-                            value={timeValue}
-                            wheelProps={{
-                                containerStyle: {width: 80, height: 300},
-                                textStyle: {fontSize: 24},
-                                wheelHeight: 100,
-                                itemHeight: 50,
+                        <DateTimePicker
+                            minuteInterval={15}
+                            minimumDate={new Date()}
+                            value={date}
+                            mode={"time"}
+                            is24Hour={true}
+                            onChange={(event, selectedDate) => {
+                                if (selectedDate) {
+                                    setDate(selectedDate)
+                                }
                             }}
-                            onChange={(newValue) => setTimeValue(newValue)}
                         />
                     </View>
                 </View>

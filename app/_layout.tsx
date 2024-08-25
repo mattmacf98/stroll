@@ -1,12 +1,13 @@
-import { ConvexAuthProvider } from "@convex-dev/auth/dist/react";
 import { ConvexReactClient } from "convex/react";
-import { Stack } from "expo-router";
-import React from "react";
+import { ConvexAuthProvider } from "@convex-dev/auth/react";
+import App from "./app";
+import { NavigationContainer } from "@react-navigation/native";
+import { StrollProvider } from "@/contexts/StrollContext";
 import * as SecureStore from "expo-secure-store";
 
 const convex = new ConvexReactClient("https://healthy-anaconda-348.convex.cloud", {
   unsavedChangesWarning: false
-});
+})
 
 const secureStorage = {
   getItem: SecureStore.getItemAsync,
@@ -14,12 +15,14 @@ const secureStorage = {
   removeItem: SecureStore.deleteItemAsync,
 };
 
-
 export default function RootLayout() {
-  
   return (
-    <ConvexAuthProvider client={convex} storage={secureStorage}>
-      <Stack/>
-    </ConvexAuthProvider>
+    <NavigationContainer independent={true}>
+        <ConvexAuthProvider client={convex} storage={secureStorage}>
+          <StrollProvider>
+            <App/>
+          </StrollProvider>
+        </ConvexAuthProvider>
+    </NavigationContainer>
   );
 }

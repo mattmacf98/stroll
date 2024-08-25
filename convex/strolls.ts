@@ -44,18 +44,28 @@ export const create = mutation({
         startTime: v.string(), minutes: v.int64()
      },
     handler: async (ctx, { owner, title, maxSize, burough, lng, lat, startTime, minutes }) => {
-      const newStrollId = await ctx.db.insert("strolls", { 
-        owner: owner, maxSize: maxSize, strollers: [owner], 
-        title: title,
-        location: {
-            burough: burough,
-            lat: lat,
-            lng: lng
-        },
-        startTime: startTime,
-        minutes: minutes
-    });
-      return newStrollId;
+        const users = await ctx.db.query("users").filter((q) => q.eq(q.field("_id"), owner)).collect();
+        if (users.length === 0) {
+            // ERROR
+            return
+        }
+        const user = users[0];
+
+        const newStrollId = await ctx.db.insert("strolls", { 
+            owner: owner, maxSize: maxSize, strollers: [owner], 
+            title: title,
+            location: {
+                burough: burough,
+                lat: lat,
+                lng: lng
+            },
+            startTime: startTime,
+            minutes: minutes
+        });
+
+        
+        ctx.db.patch(user._id, {strolls: [...(user.strolls || []), newStrollId]})
+        return newStrollId;
     }
 });
 

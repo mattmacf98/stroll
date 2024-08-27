@@ -5,7 +5,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { StrollProvider } from "@/contexts/StrollContext";
 import * as SecureStore from "expo-secure-store";
 
-const convex = new ConvexReactClient("https://healthy-anaconda-348.convex.cloud", {
+const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL ?? "https://healthy-anaconda-348.convex.cloud", {
   unsavedChangesWarning: false
 })
 

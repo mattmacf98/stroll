@@ -30,5 +30,13 @@ export default defineSchema({
         owner: v.id("users"),
         time: v.string(),
         content: v.string()
+    }),
+    articles: defineTable({
+        title: v.string(),
+        desc: v.optional(v.string()),
+        imageId: v.string(),
+        imageUrl: v.optional(v.string()),
+        url: v.string(),
+        colSpan: v.int64() // number columns to span using 4 as max width
     })
 })

@@ -5,7 +5,7 @@ import { api } from "@/convex/_generated/api";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useQuery } from "convex/react";
 import { useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, Linking, ScrollView } from "react-native";
 
 const profileImages = [
     require('../assets/images/profile_pics/0.png'),
@@ -63,13 +63,13 @@ const UserCard = (props: IUserCardProps) => {
 export default function HomePage({navigation}: any) {
     const {setBuroughIndex, setDuration} = useContext(StrollContext);
     const userStrolls = useQuery(api.strolls.getSignedInUserStrolls);
-    const user = useQuery(api.users.signedInUser);
+    const articles = useQuery(api.articles.getAll);
     
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container} contentContainerStyle={{alignItems: "center"}}>
             <Text style={styles.text}>Today's Strolls</Text>
             <FlatList
-                style={{maxHeight: 200}}
+                style={{maxHeight: 200, minHeight: 50}}
                 horizontal={true}
                 data={userStrolls}
                 keyExtractor={(stroll) => stroll._id}
@@ -93,9 +93,28 @@ export default function HomePage({navigation}: any) {
 
             <View style={{borderTopWidth: 2, width: "100%", borderColor: "#EDEAEA"}}>
                 <Text style={{textAlign: "center", marginTop: 16, fontWeight: "bold", fontSize: 32}}>News</Text>
+                <View style={{flexDirection: "row", flexWrap: "wrap"}}>
+                    {
+                        articles?.map((article) => (
+                            <TouchableOpacity key={article._id} onPress={async () => await Linking.openURL(article.url)} style={{width: `${Number(article.colSpan) * 25}%`, marginTop: 32}}>
+                                <Image
+                                    style={{width: "90%", height: 200, alignSelf: "center", borderRadius: 10}}
+                                    source={{uri: article.imageUrl}}
+                                />
+                                <Text style={{marginLeft: "5%", marginTop: 4, fontSize: 20, fontWeight: "bold"}}>
+                                {article.title} 
+                                </Text>
+                                <Text style={{marginLeft: "5%", marginTop: 4, fontSize: 14}}>
+                                    {article.desc}
+                                </Text>
+                            </TouchableOpacity>
+                        ))
+                    }
+                </View>
+                
             </View>
             
-        </View>
+        </ScrollView>
     )
 }
 
@@ -103,7 +122,7 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: '#fff',
-      alignItems: 'center',
+    //   alignItems: 'center',
     },
     text: {
       paddingTop: 32,

@@ -3,7 +3,7 @@ import { useContext, useEffect } from "react";
 import { Buroughs, StrollContext } from "../contexts/StrollContext";
 import { TimeIndicator } from "@/components/TimeIndicators/TimeIndicator";
 import { BuroughCard } from "@/components/Burough/BuroughCard";
-import { SCREEN_NAME } from "./app";
+import { SCREEN_NAME } from "@/constants/enums";
 
 export default function StartupStrollSearchPage({navigation}: any) {
     const {setBuroughIndex, setDuration, buroughIndex, duration} = useContext(StrollContext);

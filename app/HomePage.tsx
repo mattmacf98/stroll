@@ -1,11 +1,11 @@
 import { TimeIndicatorRange } from "@/components/TimeIndicators/TimeRangeIndicator";
+import { SCREEN_NAME } from "@/constants/enums";
 import { StrollContext } from "@/contexts/StrollContext";
 import { api } from "@/convex/_generated/api";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useQuery } from "convex/react";
 import { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from "react-native";
-import { SCREEN_NAME } from "./app";
 
 const profileImages = [
     require('../assets/images/profile_pics/0.png'),
@@ -81,11 +81,7 @@ export default function HomePage({navigation}: any) {
                 }}
             />
 
-            <View style={{borderTopWidth: 2, width: "100%", borderColor: "#EDEAEA"}}>
-                <Text style={{textAlign: "center", marginTop: 32, fontWeight: "bold", fontSize: 32}}>News</Text>
-            </View>
-
-            <View style={{position: "absolute", bottom: 0}}>
+            <View>
                 <TouchableOpacity style={styles.strollingButton} onPress={() => {
                     setBuroughIndex(-1);
                     setDuration(-1);
@@ -93,6 +89,10 @@ export default function HomePage({navigation}: any) {
                 }}>
                     <Text style={styles.strollingButtonText}>Find More Strolls</Text>
                 </TouchableOpacity>
+            </View>
+
+            <View style={{borderTopWidth: 2, width: "100%", borderColor: "#EDEAEA"}}>
+                <Text style={{textAlign: "center", marginTop: 16, fontWeight: "bold", fontSize: 32}}>News</Text>
             </View>
             
         </View>
@@ -112,16 +112,16 @@ const styles = StyleSheet.create({
       textAlign: "center"
     },
     strollingButton: {
-        marginBottom: 64,
+        marginBottom: 32,
         backgroundColor: '#65558F',
         width: 164,
         paddingVertical: 15,
         borderRadius: 25,
         alignItems: 'center'
       },
-      strollingButtonText: {
-          color: 'white',
-          fontSize: 16,
-          fontWeight: 'bold',
-      }
+    strollingButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    }
 });

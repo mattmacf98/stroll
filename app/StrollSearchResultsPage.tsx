@@ -7,8 +7,8 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { TimeIndicatorRange } from "@/components/TimeIndicators/TimeRangeIndicator";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { SCREEN_NAME } from "./app";
 import { Id } from "@/convex/_generated/dataModel";
+import { SCREEN_NAME } from "@/constants/enums";
 
 const profileImages = [
     require('../assets/images/profile_pics/0.png'),

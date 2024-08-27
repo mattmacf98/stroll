@@ -1,7 +1,7 @@
+import { SCREEN_NAME } from "@/constants/enums";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
-import { SCREEN_NAME } from "./app";
 
 export default function StartupPage({navigation}: any) {
     const user = useQuery(api.users.signedInUser);

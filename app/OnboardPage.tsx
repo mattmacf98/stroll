@@ -1,9 +1,9 @@
+import { SCREEN_NAME } from "@/constants/enums";
 import { api } from "@/convex/_generated/api";
 import { useAuthActions } from "@convex-dev/auth/dist/react";
 import { useQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
-import { Image, Text, View, StyleSheet, TouchableOpacity, TextInput } from "react-native";
-import { SCREEN_NAME } from "./app";
+import { Image, Text, View, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from "react-native";
 
 enum AuthMode {
   SIGN_IN,
@@ -53,7 +53,7 @@ const SignUpForm = (props: IAuthFormProps) => {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <Text style={styles.headerText}>Sign Up</Text>
       <View style={styles.topHalf}>
         <TouchableOpacity onPress={handleImageTap} style={styles.imageContainer}>
@@ -94,7 +94,7 @@ const SignUpForm = (props: IAuthFormProps) => {
             <Text style={styles.strollingButtonText}>Start Strolling</Text>
           </TouchableOpacity>
       )}
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 
@@ -114,7 +114,7 @@ const SignInForm = (props: IAuthFormProps) => {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <Text style={styles.headerText}>Sign In</Text>
       <View style={styles.topHalf}>
         <View style={styles.imageContainer}>
@@ -159,7 +159,7 @@ const SignInForm = (props: IAuthFormProps) => {
             <Text style={styles.strollingButtonText}>Start Strolling</Text>
           </TouchableOpacity>
       )}
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 

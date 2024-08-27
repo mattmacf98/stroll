@@ -3,9 +3,10 @@ import { Buroughs } from "@/contexts/StrollContext";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, NativeSyntheticEvent, TextInputSubmitEditingEventData, FlatList } from "react-native";
-import { SCREEN_NAME } from "./app";
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, NativeSyntheticEvent, TextInputSubmitEditingEventData, FlatList, KeyboardAvoidingView, Platform } from "react-native";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { Id } from "@/convex/_generated/dataModel";
+import { SCREEN_NAME } from "@/constants/enums";
 
 const profileImages = [
   require('../assets/images/profile_pics/0.png'),
@@ -44,7 +45,7 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
     const isOwner = String(stroll.owner) === user?._id;
     const buroughId = Buroughs.findIndex(b => b.name === stroll.location.burough)
     return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <View style={{flexDirection: "row"}}>
             <Text style={styles.text}>
               {stroll.title}
@@ -99,21 +100,9 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
                     data={messages}
                     keyExtractor={(message) => message._id}
                     renderItem={({ item }) => {
-                      if (user._id === item.owner) {
-                        return (
-                          <View style={{flexDirection: "row", borderWidth: 1, borderRadius: 20, borderColor: "#9BA9B0", backgroundColor: "#E5EAFF", alignSelf: "flex-end", padding: 16, marginTop: 16, marginRight: 8}}>
-                            <Text>{item.content}</Text>
-                            <Text style={{color: "#7E919A", fontSize: 12, marginTop: 2, marginLeft: 6}}>{formatTime(new Date(item.time))}</Text>
-                          </View> 
-                        )
-                      } else {
-                        return (
-                          <View style={{flexDirection: "row", borderWidth: 1, borderRadius: 20, borderColor: "#9BA9B0", alignSelf: "flex-start", padding: 16, marginTop: 16, marginLeft: 8}}>
-                            <Text>{item.content}</Text>
-                            <Text style={{color: "#7E919A", fontSize: 12, marginTop: 2, marginLeft: 6}}>{formatTime(new Date(item.time))}</Text>
-                          </View> 
-                        )
-                      }
+                      return(
+                        <Message isOwnMessage={user._id === item.owner} content={item.content} time={item.time} ownerId={item.owner} />
+                      )
                     }}
                     contentContainerStyle={{ paddingBottom: 20 }}
                   />
@@ -158,6 +147,35 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
                   </TouchableOpacity>
               </View>
             }
+      </KeyboardAvoidingView>
+    )
+  }
+}
+
+interface IMessageProps {
+  isOwnMessage: boolean,
+  content: string,
+  time: string,
+  ownerId: string
+}
+const Message = (props: IMessageProps) => {
+  const user = useQuery(api.users.get, {id: props.ownerId as Id<"users">})?.[0] || undefined;
+  
+  if (props.isOwnMessage) {
+    return (
+      <View style={{flexDirection: "row", borderWidth: 1, borderRadius: 20, borderColor: "#9BA9B0", backgroundColor: "#E5EAFF", alignSelf: "flex-end", padding: 16, marginRight: 8, marginTop: 16}}>
+        <Text>{props.content}</Text>
+        <Text style={{color: "#7E919A", fontSize: 12, marginTop: 2, marginLeft: 6}}>{formatTime(new Date(props.time))}</Text>
+      </View> 
+    )
+  } else {
+    return (
+      <View style={{flexDirection: "column", alignSelf: "flex-start", marginTop: 16}}>
+          <Text style={{color: "#7E919A", fontSize: 12, alignSelf: "flex-start", marginLeft: 16}}>{user?.name ?? ""}</Text>
+        <View style={{flexDirection: "row", borderWidth: 1, borderRadius: 20, borderColor: "#9BA9B0", alignSelf: "flex-start", padding: 16, marginLeft: 8}}>
+          <Text>{props.content}</Text>
+          <Text style={{color: "#7E919A", fontSize: 12, marginTop: 2, marginLeft: 6}}>{formatTime(new Date(props.time))}</Text>
+        </View> 
       </View>
     )
   }

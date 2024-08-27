@@ -3,12 +3,11 @@ import { TimeIndicator } from "@/components/TimeIndicators/TimeIndicator";
 import { Buroughs, StrollContext } from "@/contexts/StrollContext";
 import React, { useContext, useState } from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
-import TimePicker from 'react-native-wheel-time-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Slider from '@react-native-community/slider';
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { SCREEN_NAME } from "./app";
+import { SCREEN_NAME } from "@/constants/enums";
 
 export default function CreateStrollPage({navigation}: any) {
     const {buroughIndex, duration, userId } = useContext(StrollContext);

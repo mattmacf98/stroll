@@ -153,5 +153,10 @@ export const deleteAllStrolls = mutation({
         for (const stroll of strolls) {
             await ctx.db.delete(stroll._id)
         }
+
+        const users = await ctx.db.query("users").collect();
+        for (const user of users) {
+            await ctx.db.patch(user._id, {strolls: []})
+        }
     }
 });

@@ -15,4 +15,10 @@ crons.daily(
     api.strolls.deleteAllStrolls
 );
 
+crons.daily(
+    "update streaks daily",
+    {hourUTC: 4, minuteUTC: 0}, //12am EDT
+    api.users.updateAllStreaks
+)
+
 export default crons;

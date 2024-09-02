@@ -60,13 +60,35 @@ const UserCard = (props: IUserCardProps) => {
     )
 }
 
+const getEmojiFromStreak = (streak: number): string => {
+    if (streak === 0) {
+        return "😑"
+    } else if (streak < 5) {
+        return "🙂"
+    } else if (streak < 10) {
+        return "😏"
+    } else if (streak < 20) {
+        return "🤠"
+    } else {
+        return "🥵"
+    }
+}
+
 export default function HomePage({navigation}: any) {
     const {setBuroughIndex, setDuration} = useContext(StrollContext);
     const userStrolls = useQuery(api.strolls.getSignedInUserStrolls);
+    const user = useQuery(api.users.signedInUser);
+    const streak = (user && user.streak) ? Number(user.streak) : 0;
     const articles = useQuery(api.articles.getAll);
     
     return (
         <ScrollView style={styles.container} contentContainerStyle={{alignItems: "center"}}>
+            <View style={{alignSelf: "flex-end", marginRight: 16, marginTop: 16, flexDirection: "row"}}>
+                <Text style={{fontSize: 48}}>{getEmojiFromStreak(streak)}</Text>
+                <Text style={{fontSize: 32, fontWeight: "bold", marginLeft: 12, marginTop: 8}}>{streak}</Text>
+                <Text style={{fontSize: 12, fontWeight: "bold", marginLeft: 4, marginTop: 18}}>Days</Text>
+            </View>
+            
             <Text style={styles.text}>Today's Strolls</Text>
             <FlatList
                 style={{maxHeight: 200, minHeight: 50}}

@@ -41,10 +41,34 @@ export const create = mutation({
     }
 });
 
+export const updateAllStreaks = mutation({
+    args: {},
+    handler: async (ctx, {}) => {
+        const users = await ctx.db.query("users").collect();
+
+        for (const user of users) {
+            const lastLoginTimestamp = user.lastLoginTimestamp;
+            if (lastLoginTimestamp === undefined) return;
+
+            const lastLogin = new Date(lastLoginTimestamp).getTime();
+            const currentTime = Date.now();
+            const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
+            const loggedInToday =  currentTime - lastLogin <= twentyFourHoursInMs;
+
+            if (loggedInToday) {
+                const currentStreak = Number(user.streak) || 0;
+                await ctx.db.patch(user._id, {streak: BigInt(currentStreak + 1)});
+            } else {
+                await ctx.db.patch(user._id, {streak: BigInt(0)});
+            }
+        }
+    }
+})
+
 export const setStrolling = mutation({
     args: { id: v.id("users"), strolling: v.boolean() },
     handler: async (ctx, {id, strolling}) => {
-        await ctx.db.patch(id, {strolling: strolling});
+        await ctx.db.patch(id, {strolling: strolling, lastLoginTimestamp: new Date().toISOString()});
     }
 })
 

@@ -10,7 +10,9 @@ export default defineSchema({
         profilePicId: v.optional(v.int64()),
         strolling: v.optional(v.boolean()),
         strolls: v.optional(v.array(v.id("strolls"))),
-        lastUpdatedTimestamp: v.optional(v.string())
+        lastUpdatedTimestamp: v.optional(v.string()),
+        streak: v.optional(v.int64()),
+        lastLoginTimestamp: v.optional(v.string())
     }),
     strolls: defineTable({
         owner: v.id("users"),

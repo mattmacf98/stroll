@@ -6,5 +6,6 @@ export enum SCREEN_NAME {
     CREATE = "Create Stroll",
     RESULUTS = "Stroll Results",
     DETAIL = "Stroll Detail",
-    HOME = "Home"
+    HOME = "Home",
+    FRIENDS = "Friends"
   }

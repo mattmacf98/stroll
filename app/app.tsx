@@ -10,6 +10,7 @@ import CreateStrollPage from './CreateStrollPage';
 import HomePage from './HomePage';
 import { Button, View } from 'react-native';
 import { SCREEN_NAME } from '@/constants/enums';
+import FriendsPage from './Friends';
 
 const Stack = createNativeStackNavigator();
 
@@ -79,6 +80,20 @@ const App = () => {
             headerLeft: () => (
               <Button
                 onPress={() => navigation.goBack()}
+                title="Back"
+                color="#000"
+              />
+            ),
+          })}
+        />
+        <Stack.Screen
+          name={SCREEN_NAME.FRIENDS}
+          component={FriendsPage}
+          initialParams={{ strollId: undefined }}
+          options={({ navigation }) => ({
+            headerLeft: () => (
+              <Button
+                onPress={() => navigation.navigate(SCREEN_NAME.HOME)}
                 title="Back"
                 color="#000"
               />

@@ -83,10 +83,19 @@ export default function HomePage({navigation}: any) {
     
     return (
         <ScrollView style={styles.container} contentContainerStyle={{alignItems: "center"}}>
-            <View style={{alignSelf: "flex-end", marginRight: 16, marginTop: 16, flexDirection: "row"}}>
-                <Text style={{fontSize: 48}}>{getEmojiFromStreak(streak)}</Text>
-                <Text style={{fontSize: 32, fontWeight: "bold", marginLeft: 12, marginTop: 8}}>{streak}</Text>
-                <Text style={{fontSize: 12, fontWeight: "bold", marginLeft: 4, marginTop: 18}}>Days</Text>
+            
+
+            <View style={{flexDirection: "row", justifyContent: "space-between", width: "90%", marginHorizontal: 16}}>
+                <TouchableOpacity onPress={() => navigation.navigate(SCREEN_NAME.FRIENDS)}>
+                    <FontAwesome6 name="people-group" size={48} color="black" />
+                </TouchableOpacity>
+                
+                <View style={{flexDirection: "row"}}>
+                    <Text style={{fontSize: 48}}>{getEmojiFromStreak(streak)}</Text>
+                    <Text style={{fontSize: 32, fontWeight: "bold", marginLeft: 12, marginTop: 8}}>{streak}</Text>
+                    <Text style={{fontSize: 12, fontWeight: "bold", marginLeft: 4, marginTop: 18}}>Days</Text>    
+                </View>
+                
             </View>
             
             <Text style={styles.text}>Today's Strolls</Text>

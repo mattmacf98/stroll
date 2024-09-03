@@ -12,6 +12,12 @@ export default defineSchema({
         strolls: v.optional(v.array(v.id("strolls"))),
         lastUpdatedTimestamp: v.optional(v.string()),
         streak: v.optional(v.int64()),
+        friends: v.optional(v.array(
+            v.object({
+                user: v.id("users"),
+                status: v.string() // CONFIRMED, REQUESTED, PENDING
+            })
+        )),
         lastLoginTimestamp: v.optional(v.string())
     }),
     strolls: defineTable({

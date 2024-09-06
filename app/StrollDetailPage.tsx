@@ -30,6 +30,7 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
   const user = useQuery(api.users.signedInUser);
   const messages = useQuery(api.messages.get, {strollId: route.params.strollId});
   const sendMessage = useMutation(api.messages.send);
+  const [typing, setTyping] = useState(false)
 
 
   useEffect(() => {
@@ -46,28 +47,30 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
     const buroughId = Buroughs.findIndex(b => b.name === stroll.location.burough)
     return (
       <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <View style={{flexDirection: "row"}}>
-            <Text style={styles.text}>
-              {stroll.title}
-            </Text>
+        {!typing &&
+          <>
+            <View style={{flexDirection: "row"}}>
+              <Text style={styles.text}>
+                {stroll.title}
+              </Text>
 
-            {
-              user && stroll.strollers.includes(user._id) &&
-              <TouchableOpacity style={{marginLeft: 16, marginTop: 16}} onPress={() => {
-                if (isOwner) {
-                  deleteStroll({id: stroll._id});
-                  navigation.navigate(SCREEN_NAME.RESULUTS)
-                } else {
-                  leaveStroll({strollId: stroll._id, userId: user._id})
-                }
-              }}>
-                <FontAwesome6 name="trash-can" size={32}/>
-                <Text style={{position: "relative", right: 4}}>
-                  {isOwner ? "Delete" : "Leave"}
-                </Text>
-              </TouchableOpacity>
-            }
-        </View>
+              {
+                user && stroll.strollers.includes(user._id) &&
+                <TouchableOpacity style={{marginLeft: 16, marginTop: 16}} onPress={() => {
+                  if (isOwner) {
+                    deleteStroll({id: stroll._id});
+                    navigation.navigate(SCREEN_NAME.RESULUTS)
+                  } else {
+                    leaveStroll({strollId: stroll._id, userId: user._id})
+                  }
+                }}>
+                  <FontAwesome6 name="trash-can" size={32}/>
+                  <Text style={{position: "relative", right: 4}}>
+                    {isOwner ? "Delete" : "Leave"}
+                  </Text>
+                </TouchableOpacity>
+              }
+          </View>
 
           <View style={{flexDirection: "row"}}>
             <TimeIndicatorRangeLarge startTime={stroll.startTime} minutes={Number(stroll.minutes)}/>
@@ -92,9 +95,12 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
             </View>
             <Text style={{fontSize: 16, fontWeight: "bold", position: "relative", color: "#C4C4C4", right: 100, top: 50}}>{stroll.strollers.length}/{Number(stroll.maxSize)}</Text>
           
+          </>
+        }
+          
             {
               user && stroll.strollers.includes(user._id) &&
-              <View style={{borderTopWidth: 1, borderTopColor: "#E6E6E6", width: "100%", top: 60, flex: 1, maxHeight: 200}}>
+              <View style={{borderTopWidth: typing ? 0 : 1, borderTopColor: "#E6E6E6", width: "100%", top: typing ? 0 : 60, flex: 1, maxHeight: typing ? "70%" : "30%"}}>
                   <FlatList
                     style={{height: 50}}
                     data={messages}
@@ -104,13 +110,12 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
                         <Message isOwnMessage={user._id === item.owner} content={item.content} time={item.time} ownerId={item.owner} />
                       )
                     }}
-                    contentContainerStyle={{ paddingBottom: 20 }}
                   />
               </View>
             }
             {
               user && stroll.strollers.includes(user._id) &&
-              <View style={{position: "relative", top: 60}}>
+              <View style={{position: "relative", top: typing ? 10 : 60}}>
                  <TextInput
                     placeholder="Enter Your Message"
                     style={{
@@ -124,6 +129,8 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
                       alignSelf: "center"
                     }}
                     value={messageContent}
+                    onFocus={() => setTyping(true)}
+                    onBlur={() => setTyping(false)}
                     onChangeText={setMessageContent}
                     onSubmitEditing={async () => {
                         if (messageContent === "") {

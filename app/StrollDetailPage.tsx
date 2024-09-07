@@ -74,6 +74,16 @@ export default function StrollDetailPage({navigation, route}: {navigation: any, 
 
           <View style={{flexDirection: "row"}}>
             <TimeIndicatorRangeLarge startTime={stroll.startTime} minutes={Number(stroll.minutes)}/>
+
+            {
+              stroll.friendsOnly &&
+              <View style={{marginLeft: 32, flexDirection: "column", alignItems: "center"}}>
+                <FontAwesome6 name="person" size={32} color="#34C759"/>
+                <Text style={{fontSize: 10, fontWeight: "bold", color: "#34C759"}}>Friends Only</Text>
+              </View>
+            }
+            
+            
           </View>
 
           <Image

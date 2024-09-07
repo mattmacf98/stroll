@@ -31,7 +31,8 @@ export default defineSchema({
         }),
         startTime: v.string(),
         minutes: v.int64(),
-        maxSize: v.int64()
+        maxSize: v.int64(),
+        friendsOnly: v.boolean()
     }),
     messages: defineTable({
         stroll: v.id("strolls"),

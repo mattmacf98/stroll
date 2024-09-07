@@ -41,9 +41,9 @@ export const getSignedInUserStrolls = query({
 export const create = mutation({
     args: { 
         owner: v.id("users"), title: v.string(), maxSize: v.int64(), burough: v.string(), lat: v.float64(), lng: v.float64(),
-        startTime: v.string(), minutes: v.int64()
+        startTime: v.string(), minutes: v.int64(), friendsOnly: v.boolean()
      },
-    handler: async (ctx, { owner, title, maxSize, burough, lng, lat, startTime, minutes }) => {
+    handler: async (ctx, { owner, title, maxSize, burough, lng, lat, startTime, minutes, friendsOnly }) => {
         const users = await ctx.db.query("users").filter((q) => q.eq(q.field("_id"), owner)).collect();
         if (users.length === 0) {
             // ERROR
@@ -60,7 +60,8 @@ export const create = mutation({
                 lng: lng
             },
             startTime: startTime,
-            minutes: minutes
+            minutes: minutes,
+            friendsOnly: friendsOnly
         });
 
         
@@ -132,6 +133,11 @@ export const filter = query({
         minutes: v.optional(v.int64())
     },
     handler: async (ctx, {burough, minutes}) => {
+        const userId = await getAuthUserId(ctx);
+        if (userId === null) {
+            return []
+        }
+
         let strollsQuery = ctx.db.query("strolls");
 
         if (burough !== undefined) {
@@ -142,7 +148,19 @@ export const filter = query({
             strollsQuery = strollsQuery.filter((q) => q.eq(q.field("minutes"), minutes))
         }
 
-        return await strollsQuery.collect();
+        const strolls = await strollsQuery.collect();
+        const publicStrolls = strolls.filter(s => !s.friendsOnly);
+        const privateStrolls = strolls.filter(s => s.friendsOnly);
+
+        const resultStrolls = publicStrolls;
+        for (const stroll of privateStrolls) {
+            const strollOwner = await ctx.db.get(stroll.owner);
+            if (strollOwner?._id === userId || strollOwner?.friends?.filter(f => f.status === "CONFIRMED").map(f => f.user).includes(userId)) {
+                resultStrolls.push(stroll);
+            }
+        }
+
+        return resultStrolls;
     }
 })
 

@@ -2,7 +2,7 @@ import { BuroughCard } from "@/components/Burough/BuroughCard";
 import { TimeIndicator } from "@/components/TimeIndicators/TimeIndicator";
 import { Buroughs, StrollContext } from "@/contexts/StrollContext";
 import React, { useContext, useState } from "react";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity, Switch } from "react-native";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Slider from '@react-native-community/slider';
 import { useMutation, useQuery } from "convex/react";
@@ -13,6 +13,7 @@ export default function CreateStrollPage({navigation}: any) {
     const {buroughIndex, duration, userId } = useContext(StrollContext);
     const [date, setDate] = useState(new Date());
     const [maxStrollers, setMaxStrollers] = useState(1);
+    const [friendsOnly, setFriendsOnly] = useState(false);
     const createStroll = useMutation(api.strolls.create);
     const user = useQuery(api.users.signedInUser)
 
@@ -23,13 +24,14 @@ export default function CreateStrollPage({navigation}: any) {
                   owner: user._id,
                   title: `${user.name}'s Stroll`, burough: Buroughs[buroughIndex].name, 
                   lat: 0, lng: 0, startTime: date.toISOString(), minutes: BigInt(duration),
-                  maxSize: BigInt(maxStrollers) 
+                  maxSize: BigInt(maxStrollers), friendsOnly: friendsOnly 
                 }
               );
             navigation.navigate(SCREEN_NAME.DETAIL, {strollId: strollId});
         }
     }
 
+    //TODO: Friends Only Toggle
     return (
         <View style={styles.container}>
 
@@ -40,9 +42,23 @@ export default function CreateStrollPage({navigation}: any) {
 
             <View style={{width: "100%", height: 1, backgroundColor: "#CECECE"}}/>
 
+            <View style={{flexDirection: "row", width: "100%", marginTop: 16, marginLeft: 64}}>
+                <View>
+                    <Switch
+                        style={{alignSelf: "flex-start", marginLeft: 8}}
+                        trackColor={{false: '#767577', true: '#34C759'}}
+                        thumbColor="#ffffff"
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={() => setFriendsOnly(!friendsOnly)}
+                        value={friendsOnly}
+                    />
+                    <Text style={{textAlign: "center", marginTop: 4, fontSize: 12, fontWeight: "bold"}}>{friendsOnly ? "Friends Only" : "Public"}</Text>
+                </View>
+            </View>
+
             <View style={{flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
                 <View >
-                    <View style={{marginTop: 32}}>
+                    <View style={{marginTop: 16}}>
                         <Text style={{textAlign: "center", fontSize: 32, fontWeight: "bold"}}>When?</Text>
                     </View>
 
